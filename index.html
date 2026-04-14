@@ -15,17 +15,16 @@
           <h1>AquaMind</h1>
           <button id="launchBtn" class="cta">Launch Dashboard</button>
         </header>
-        <div class="hero-content">
+        <div class="hero-content glass">
           <div>
             <p class="eyebrow">AI-Powered Ocean Digital Twin</p>
-            <h2>Real-time ocean intelligence for coral reefs, bots, and underwater infrastructure.</h2>
-            <p>
-              Monitor reefs, track autonomous bots, detect pollution anomalies, and interact with mission AI in one command center.
-            </p>
+            <h2>Ocean mission control for reefs, infrastructure, swarm bots, and predictive risk intelligence.</h2>
+            <p>Built for real-time monitoring with GIS overlays, AI vision, multilingual operation, and mode-adaptive workflows.</p>
             <ul class="feature-list">
-              <li>🪸 Coral reef health monitoring</li>
-              <li>🤖 Swarm bot live tracking</li>
-              <li>☣️ AI pollution & anomaly alerts</li>
+              <li>🪸 Reef health + bleaching predictions</li>
+              <li>🤖 5-bot swarm tracking and mission assignment</li>
+              <li>☣️ Pollution and leak anomaly detection</li>
+              <li>🧠 Sensor + vision fusion insights</li>
             </ul>
           </div>
           <div class="ocean-preview glass">
@@ -42,6 +41,7 @@
           <div class="brand-block">
             <h1>AquaMind Mission Control</h1>
             <span id="statusBadge" class="status online">System Online</span>
+            <span id="offlineBadge" class="status edge">Edge AI Cache: Active</span>
           </div>
           <div class="controls">
             <label for="modeSelect">Mode</label>
@@ -58,9 +58,17 @@
           <aside class="panel glass left-panel">
             <div class="panel-header">
               <h3 data-i18n="botsTitle">Bot Control & Tracking</h3>
-              <button id="swarmBtn">Swarm View</button>
+              <button id="swarmBtn" data-i18n="swarmBtn">Swarm View</button>
             </div>
             <div id="botList" class="bot-list"></div>
+            <div class="network-card">
+              <h4 data-i18n="networkTitle">Hybrid Ocean Network</h4>
+              <ul>
+                <li>📶 Acoustic: <span id="netAcoustic">Stable</span></li>
+                <li>💡 Optical: <span id="netOptical">Moderate</span></li>
+                <li>🛰️ Relay (Buoy/Sat): <span id="netRelay">Stable</span></li>
+              </ul>
+            </div>
           </aside>
 
           <section class="panel glass center-panel">
@@ -69,6 +77,7 @@
               <span id="activeModePill" class="pill">Monitoring</span>
             </div>
             <div id="map"></div>
+            <div class="mode-focus" id="modeFocus"></div>
           </section>
 
           <aside class="panel glass right-panel">
@@ -77,8 +86,8 @@
             </div>
             <div class="vision-card">
               <input type="file" id="imageUpload" accept="image/*" />
-              <button id="analyzeBtn">Analyze Scene</button>
-              <p id="visionText">Upload an image or simulate webcam frame to detect fish, coral, plastic, pipelines, and obstacles.</p>
+              <button id="analyzeBtn" data-i18n="analyzeBtn">Analyze Scene</button>
+              <p id="visionText"></p>
               <div id="detections" class="detections"></div>
             </div>
             <div class="alerts" id="alertList"></div>
@@ -86,8 +95,8 @@
               <h4 data-i18n="chatTitle">Mission Assistant</h4>
               <div id="chatLog" class="chat-log"></div>
               <div class="chat-input-row">
-                <input id="chatInput" type="text" placeholder="Ask about bots, reefs, or pollution..." />
-                <button id="chatSend">Send</button>
+                <input id="chatInput" type="text" placeholder="Ask about bots, reefs, pollution, or predictions..." />
+                <button id="chatSend" data-i18n="sendBtn">Send</button>
               </div>
             </div>
           </aside>
@@ -102,9 +111,13 @@
           <div class="reef-card">
             <h4 data-i18n="reefTitle">Coral Reef Monitoring</h4>
             <p id="reefSummary"></p>
-            <div class="reef-meter">
-              <span id="reefScore">82</span>/100
+            <div class="reef-meter"><span id="reefScore">82</span>/100</div>
+            <div class="reef-scale">
+              <span class="healthy">🟢 Healthy</span>
+              <span class="moderate">🟡 Moderate</span>
+              <span class="critical">🔴 Critical</span>
             </div>
+            <p id="predictionText"></p>
           </div>
         </section>
       </section>
