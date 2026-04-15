@@ -60,7 +60,36 @@ select,input{background:rgba(5,26,38,.85);color:var(--text);border:1px solid var
 .bot-dialog{width:min(450px,90vw);color:var(--text)}
 .cam-feed{height:120px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;border-radius:8px;margin:.4rem 0;background:rgba(57,233,255,.08)}
 
-.mode-Alert .center-panel,.mode-Alert .right-panel{border-color:rgba(255,102,122,.45)}
-.mode-Ecology .center-panel,.mode-Ecology .left-panel{border-color:rgba(97,251,178,.45)}
+
+.mode-alert{background:radial-gradient(circle at top,#4a1f2b 0%, #0f1b24 40%, #06141d 100%)}
+.mode-alert .grid-layout{grid-template-columns:24% 34% 42%}
+.mode-alert .center-panel,.mode-alert .right-panel{border-color:rgba(255,102,122,.6);box-shadow:0 0 0 1px rgba(255,102,122,.3),0 0 24px rgba(255,102,122,.25)}
+
+.mode-exploration .grid-layout{grid-template-columns:26% 49% 25%}
+.mode-exploration .coral-mini{display:none}
+.mode-exploration #map{min-height:520px}
+
+.mode-prediction #predictionText{color:var(--yellow);font-weight:700}
+.mode-prediction .reef-card{box-shadow:0 0 0 1px rgba(255,215,111,.35),0 0 16px rgba(255,215,111,.2)}
+
+.mode-engineer .reef-card{display:none}
+.mode-engineer .left-panel .sensor-grid{grid-template-columns:1fr}
+.mode-engineer .center-panel{border-color:rgba(255,159,112,.6)}
+
+.mode-ecology .vision-card{opacity:.55}
+.mode-ecology .center-panel,.mode-ecology .left-panel{border-color:rgba(97,251,178,.55);box-shadow:0 0 0 1px rgba(97,251,178,.25),0 0 18px rgba(97,251,178,.2)}
 
 @media (max-width:1200px){.hero-content,.grid-layout,.bottom-panel{grid-template-columns:1fr}}
+
+.stats-strip{margin:.75rem;display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem}
+.stat-card{padding:.5rem .65rem;display:flex;justify-content:space-between;align-items:center;font-size:.82rem}
+.stat-card strong{font-size:1.1rem;color:var(--cyan)}
+.mini-controls{display:flex;gap:.25rem}
+.mini-btn{font-size:.68rem;padding:.2rem .45rem}
+.toast{position:fixed;right:18px;bottom:18px;background:rgba(6,24,36,.92);border:1px solid var(--line);padding:.55rem .75rem;border-radius:9px;opacity:0;transform:translateY(6px);transition:.2s;pointer-events:none;z-index:1000}
+.toast.show{opacity:1;transform:translateY(0)}
+
+.mode-alert .stat-card strong{color:var(--red)}
+.mode-ecology .stat-card strong{color:var(--green)}
+
+@media (max-width:1200px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
