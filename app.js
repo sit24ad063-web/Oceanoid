@@ -4,6 +4,7 @@ const i18n = {
     botsTitle: 'Bot Control & Monitoring', swarmBtn: 'Swarm View', sensorTitle: 'Sensor Intelligence',
     mapTitle: 'Ocean Map', alertsTitle: 'Alerts', aiDetection: 'AI Detection', analyzeBtn: 'Analyze Scene',
     assistant: 'Assistant', sendBtn: 'Send', eventsTitle: 'Live Mission Logs', coralHealth: 'Coral Health',
+    activeBots: 'Active Bots', criticalAlerts: 'Critical Alerts', reefScoreLabel: 'Reef Score', networkLabel: 'Network',
     inputPlaceholder: 'Ask something...', reefSummary: 'C-7 coral zone is under thermal stress with high bleaching risk.',
     prediction: 'Prediction: pollution plume likely to shift northeast over the next 6 hours.',
     modeFocus: {
@@ -20,6 +21,7 @@ const i18n = {
     botsTitle: 'பாட் கட்டுப்பாடு மற்றும் கண்காணிப்பு', swarmBtn: 'குழு பாட்கள் காட்சி', sensorTitle: 'சென்சார் நுண்ணறிவு',
     mapTitle: 'கடல் வரைபடம்', alertsTitle: 'எச்சரிக்கைகள்', aiDetection: 'செயற்கை நுண்ணறிவு கண்டறிதல்', analyzeBtn: 'காட்சியை பகுப்பாய்வு செய்',
     assistant: 'உதவி அமைப்பு', sendBtn: 'அனுப்பு', eventsTitle: 'நேரடி மிஷன் பதிவுகள்', coralHealth: 'பவள ஆரோக்கியம்',
+    activeBots: 'செயலில் உள்ள பாட்கள்', criticalAlerts: 'முக்கிய எச்சரிக்கைகள்', reefScoreLabel: 'பவள மதிப்பெண்', networkLabel: 'நெட்வொர்க்',
     inputPlaceholder: 'ஏதாவது கேளுங்கள்...', reefSummary: 'C-7 பவள பகுதியில் வெண்மைப்படுதல் அபாயம் அதிகரித்துள்ளது.',
     prediction: 'முன்கணிப்பு: அடுத்த 6 மணி நேரத்தில் மாசு மேகம் வடகிழக்கு திசைக்கு நகரலாம்.',
     modeFocus: {
@@ -57,6 +59,7 @@ let map, activeLang = 'en', selectedBot, simTimer, mode = 'Monitoring';
 const botMarkers = {}, botTracks = {};
 const modeSelect = e('modeSelect');
 const layers = {};
+let alertFilter = 'all';
 
 const alertHotspots = [
   { text: 'Oil Spill Detected', latlng: [10.05, 80.2], critical: true },
@@ -119,7 +122,8 @@ function renderSensors() {
 
 function renderAlerts() {
   e('alertList').innerHTML = '';
-  alertHotspots.forEach(a => {
+  const visible = alertHotspots.filter(a => alertFilter === 'all' || a.critical);
+  visible.forEach(a => {
     const text = activeLang === 'ta'
       ? (a.text === 'Oil Spill Detected' ? 'எண்ணெய் கசிவு கண்டறியப்பட்டது' : a.text === 'Coral Bleaching Risk' ? 'பவள வெண்மைப்படுதல் அபாயம்' : 'குழாய் கசிவு')
       : a.text;
@@ -129,6 +133,7 @@ function renderAlerts() {
     div.onclick = () => map.flyTo(a.latlng, 11);
     e('alertList').append(div);
   });
+  e('statAlerts').textContent = String(alertHotspots.filter(a => a.critical).length);
 }
 
 function pushLog(msg) {
@@ -136,6 +141,20 @@ function pushLog(msg) {
   li.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
   e('eventLog').prepend(li);
   while (e('eventLog').children.length > 12) e('eventLog').lastChild.remove();
+}
+
+function updateStats() {
+  e('statBots').textContent = String(bots.filter(b => b.battery > 15).length);
+  e('statReef').textContent = String(70 + Math.floor(Math.random() * 25));
+  e('statNet').textContent = mode === 'Alert' ? 'Degraded' : mode === 'Exploration' ? 'Adaptive' : 'Stable';
+}
+
+function showToast(message) {
+  const t = e('toast');
+  t.textContent = message;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 1500);
 }
 
 function applyLanguage(lang) {
@@ -174,6 +193,8 @@ function applyMode(nextMode) {
   if (nextMode === 'Prediction') map.flyTo([10.22, 80.32], 9);
 
   pushLog(`${nextMode} mode enabled.`);
+  showToast(`${nextMode} mode applied`);
+  updateStats();
 }
 
 function simulate() {
@@ -190,6 +211,7 @@ function simulate() {
   });
   renderBots();
   renderSensors();
+  updateStats();
 }
 
 function chatReply(q) {
@@ -229,6 +251,8 @@ function wireEvents() {
     map.fitBounds(L.latLngBounds(bots.map(b => [b.lat, b.lng])).pad(.45));
     pushLog('Swarm view enabled.');
   };
+  e('alertAll').onclick = () => { alertFilter = 'all'; renderAlerts(); showToast('Showing all alerts'); };
+  e('alertCritical').onclick = () => { alertFilter = 'critical'; renderAlerts(); showToast('Showing critical alerts'); };
   e('analyzeBtn').onclick = () => {
     const out = ['Fish Detected 93%', 'Plastic Detected 78%', 'Pipeline Fracture 71%'].sort(() => .5 - Math.random()).slice(0, 2);
     e('detections').innerHTML = out.map(x => `<span>${x}</span>`).join('');
@@ -246,6 +270,18 @@ function wireEvents() {
     e('chatInput').value = '';
   };
   e('closeDialog').onclick = () => e('botDialog').close();
+  document.addEventListener('keydown', ev => {
+    if (ev.key >= '1' && ev.key <= '6') {
+      modeSelect.value = modes[Number(ev.key) - 1];
+      applyMode(modeSelect.value);
+    }
+    if (ev.key.toLowerCase() === 'l') {
+      const next = e('langSelect').value === 'en' ? 'ta' : 'en';
+      e('langSelect').value = next;
+      applyLanguage(next);
+      showToast(next === 'en' ? 'Language: English' : 'மொழி: தமிழ்');
+    }
+  });
 }
 
 initMap();
@@ -254,4 +290,5 @@ modeSelect.value = 'Monitoring';
 applyLanguage('en');
 applyMode('Monitoring');
 pushLog('Mission initialized. Live stream connected.');
+updateStats();
 simTimer = setInterval(simulate, 1000);
