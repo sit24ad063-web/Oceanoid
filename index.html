@@ -1,82 +1,121 @@
-:root {
-  --bg1: #0b1f2a;
-  --bg2: #06141d;
-  --cyan: #39e9ff;
-  --green: #61fbb2;
-  --red: #ff667a;
-  --yellow: #ffd76f;
-  --line: rgba(89, 224, 255, .35);
-  --text: #dcf8ff;
-}
-* { box-sizing: border-box; }
-body { margin: 0; font-family: Inter, system-ui, sans-serif; color: var(--text); background: radial-gradient(circle at top, #123348 0%, var(--bg1) 30%, var(--bg2) 100%); }
-.page { display:none; min-height:100vh; } .page.active{display:block;}
-.glass { background: rgba(7, 28, 43, .62); border: 1px solid var(--line); box-shadow: 0 12px 35px rgba(0,0,0,.28); backdrop-filter: blur(10px); border-radius: 14px; }
-.top-hero-nav,.topbar{margin:.75rem;padding:.75rem 1rem;display:flex;justify-content:space-between;align-items:center;}
-.hero-content{margin:.75rem;padding:1rem;display:grid;grid-template-columns:1.1fr 1fr;gap:1rem;}
-button{background:linear-gradient(90deg,#20b0f0,var(--cyan));border:none;border-radius:8px;padding:.5rem .82rem;font-weight:700;color:#032;cursor:pointer;}
-.feature-list{line-height:1.7;}
-.ocean-preview{position:relative;min-height:220px;display:flex;justify-content:center;align-items:end;overflow:hidden;}
-.wave{position:absolute;width:160%;height:110px;border-radius:44%;background:rgba(57,233,255,.15);animation:drift 8s linear infinite;}
-.wave-1{bottom:40px}.wave-2{bottom:20px;animation-duration:11s}.wave-3{bottom:0;animation-duration:14s}
-@keyframes drift{from{transform:translateX(-15%)}to{transform:translateX(10%)}}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AquaMind — Ocean Intelligence Mission Control</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <section id="landing" class="page active">
+        <header class="top-hero-nav glass">
+          <h1>AquaMind</h1>
+          <button id="launchBtn" class="cta">Launch Dashboard</button>
+        </header>
+        <div class="hero-content glass">
+          <div>
+            <p class="eyebrow">AI-Powered Ocean Digital Twin</p>
+            <h2>NASA-style mission control for reefs, pipelines, swarm bots, and predictive ocean intelligence.</h2>
+            <ul class="feature-list">
+              <li>🗺️ Live map with smart layer toggles</li>
+              <li>🤖 Real-time swarm bots + telemetry</li>
+              <li>🚨 Animated alerts + auto map focus</li>
+              <li>🌐 Professional Tamil + English UI</li>
+            </ul>
+          </div>
+          <div class="ocean-preview glass" aria-hidden="true">
+            <div class="wave wave-1"></div><div class="wave wave-2"></div><div class="wave wave-3"></div>
+            <p>Live Ocean Preview</p>
+          </div>
+        </div>
+      </section>
 
-.controls{display:flex;gap:.55rem;align-items:center}
-select,input{background:rgba(5,26,38,.85);color:var(--text);border:1px solid var(--line);border-radius:7px;padding:.35rem .45rem;}
-.status{padding:.18rem .45rem;border-radius:18px;font-size:.8rem}.status.online{background:rgba(97,251,178,.2);color:var(--green)}
+      <section id="dashboard" class="page">
+        <header class="topbar glass">
+          <div class="brand-block">
+            <h1 data-i18n="missionControl">Mission Control</h1>
+            <span id="statusBadge" class="status online" data-i18n="systemOnline">System Online</span>
+          </div>
+          <div class="controls">
+            <label for="modeSelect" data-i18n="modeLabel">Mode</label>
+            <select id="modeSelect"></select>
+            <label for="langSelect" data-i18n="languageLabel">Language</label>
+            <select id="langSelect"><option value="en">English</option><option value="ta">தமிழ்</option></select>
+          </div>
+        </header>
 
-.grid-layout{margin:.75rem;display:grid;grid-template-columns:30% 40% 30%;gap:.75rem;min-height:60vh;}
-.panel{padding:.7rem;display:flex;flex-direction:column;gap:.45rem}
-.panel-header{display:flex;justify-content:space-between;align-items:center}
-.bot-list{display:grid;gap:.45rem;max-height:265px;overflow:auto}
-.bot-card{border:1px solid var(--line);padding:.5rem;border-radius:10px;background:rgba(2,15,26,.72);font-size:.85rem;transition:all .2s ease;cursor:pointer}
-.bot-card:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 0 0 1px rgba(57,233,255,.45),0 0 18px rgba(57,233,255,.22)}
-.bot-card.active{border-color:var(--cyan)}
-.sensor-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.45rem}
-.sensor-card{border:1px solid var(--line);padding:.45rem;border-radius:8px;font-size:.8rem}
-.sensor-card.good{border-left:3px solid var(--green)}
-.sensor-card.warn{border-left:3px solid var(--yellow)}
-.sensor-card.crit{border-left:3px solid var(--red)}
+        <section class="stats-strip">
+          <div class="stat-card glass"><span data-i18n="activeBots">Active Bots</span><strong id="statBots">5</strong></div>
+          <div class="stat-card glass"><span data-i18n="criticalAlerts">Critical Alerts</span><strong id="statAlerts">2</strong></div>
+          <div class="stat-card glass"><span data-i18n="reefScoreLabel">Reef Score</span><strong id="statReef">82</strong></div>
+          <div class="stat-card glass"><span data-i18n="networkLabel">Network</span><strong id="statNet">Stable</strong></div>
+        </section>
 
-#map{min-height:460px;border-radius:10px;overflow:hidden}
-.mode-focus{font-size:.84rem;color:#abedff;border-left:3px solid var(--cyan);padding-left:.45rem}
-.pill{background:rgba(57,233,255,.2);color:var(--cyan);padding:.2rem .5rem;border-radius:16px;font-size:.78rem}
+        <main class="grid-layout">
+          <aside class="panel glass left-panel">
+            <div class="panel-header"><h3 data-i18n="botsTitle">Bot Control & Monitoring</h3><button id="swarmBtn" data-i18n="swarmBtn">Swarm View</button></div>
+            <div id="botList" class="bot-list"></div>
+            <div class="panel-header"><h3 data-i18n="sensorTitle">Sensor Intelligence</h3></div>
+            <div class="sensor-grid" id="sensorGrid"></div>
+            <div class="coral-mini glass">
+              <h4 data-i18n="coralHealth">Coral Health</h4>
+              <p id="reefSummary"></p>
+            </div>
+          </aside>
 
-.alerts{display:grid;gap:.4rem}
-.alert{padding:.43rem .5rem;border-radius:7px;background:rgba(255,102,122,.16);border-left:4px solid var(--red);font-size:.84rem}
-.alert.critical{animation:flash 1s infinite}
-@keyframes flash{50%{box-shadow:0 0 0 1px rgba(255,102,122,.7),0 0 20px rgba(255,102,122,.35)}}
-.vision-card,.chat-card,.coral-mini{border:1px solid var(--line);border-radius:10px;padding:.52rem}
-.detections{display:flex;flex-wrap:wrap;gap:.35rem}.detections span{background:rgba(57,233,255,.17);padding:.16rem .45rem;border-radius:14px;font-size:.76rem}
-.chat-log{border:1px solid var(--line);min-height:110px;max-height:150px;overflow:auto;padding:.4rem;border-radius:8px;font-size:.85rem}
-.chat-input-row{display:flex;gap:.4rem;margin-top:.35rem}.chat-input-row input{flex:1}
-.suggestions{display:flex;gap:.3rem;flex-wrap:wrap}.suggest{font-size:.73rem;padding:.25rem .42rem}
+          <section class="panel glass center-panel">
+            <div class="panel-header"><h3 data-i18n="mapTitle">Ocean Map</h3><span id="activeModePill" class="pill">Monitoring</span></div>
+            <div id="map"></div>
+            <div id="modeFocus" class="mode-focus"></div>
+          </section>
 
-.bottom-panel{margin:.75rem;padding:.7rem;display:grid;grid-template-columns:60% 40%;gap:.7rem}
-.log-box ul{margin:.3rem 0 0;padding-left:1rem;max-height:150px;overflow:auto;font-size:.84rem}
-.reef-meter{font-size:1.8rem;color:var(--green);font-weight:700}
-.reef-scale{display:flex;gap:.45rem;font-size:.74rem}
+          <aside class="panel glass right-panel">
+            <div class="panel-header"><h3 data-i18n="alertsTitle">Alerts</h3><div class="mini-controls"><button id="alertAll" class="mini-btn">All</button><button id="alertCritical" class="mini-btn">Critical</button></div></div>
+            <div id="alertList" class="alerts"></div>
+            <div class="vision-card">
+              <h4 data-i18n="aiDetection">AI Detection</h4>
+              <input type="file" id="imageUpload" accept="image/*" />
+              <button id="analyzeBtn" data-i18n="analyzeBtn">Analyze Scene</button>
+              <p id="visionText"></p>
+              <div id="detections" class="detections"></div>
+            </div>
+            <div class="chat-card">
+              <h4 data-i18n="assistant">Assistant</h4>
+              <div class="suggestions"><button class="suggest" data-q="Show coral status">Show coral status</button><button class="suggest" data-q="Any leaks?">Any leaks?</button></div>
+              <div id="chatLog" class="chat-log"></div>
+              <div class="chat-input-row"><input id="chatInput" type="text" /><button id="chatSend" data-i18n="sendBtn">Send</button></div>
+            </div>
+          </aside>
+        </main>
 
-.bot-dialog{width:min(450px,90vw);color:var(--text)}
-.cam-feed{height:120px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;border-radius:8px;margin:.4rem 0;background:rgba(57,233,255,.08)}
+        <section class="bottom-panel glass">
+          <div class="log-box">
+            <h4 data-i18n="eventsTitle">Live Mission Logs</h4>
+            <ul id="eventLog"></ul>
+          </div>
+          <div class="reef-card">
+            <h4 data-i18n="coralHealth">Coral Health</h4>
+            <div class="reef-meter"><span id="reefScore">82</span>/100</div>
+            <p id="predictionText"></p>
+            <div class="reef-scale"><span class="healthy">🟢 Healthy</span><span class="moderate">🟡 Moderate</span><span class="critical">🔴 Critical</span></div>
+          </div>
+        </section>
+      </section>
+    </div>
 
+    <dialog id="botDialog" class="bot-dialog glass">
+      <h3 id="dialogTitle">BOT-1</h3>
+      <div class="cam-feed">Live Camera Feed (Simulated)</div>
+      <p id="dialogStats"></p>
+      <div id="dialogDetections" class="detections"></div>
+      <button id="closeDialog">Close</button>
+    </dialog>
 
-.mode-alert{background:radial-gradient(circle at top,#4a1f2b 0%, #0f1b24 40%, #06141d 100%)}
-.mode-alert .grid-layout{grid-template-columns:24% 34% 42%}
-.mode-alert .center-panel,.mode-alert .right-panel{border-color:rgba(255,102,122,.6);box-shadow:0 0 0 1px rgba(255,102,122,.3),0 0 24px rgba(255,102,122,.25)}
+    <div id="toast" class="toast" aria-live="polite"></div>
 
-.mode-exploration .grid-layout{grid-template-columns:26% 49% 25%}
-.mode-exploration .coral-mini{display:none}
-.mode-exploration #map{min-height:520px}
-
-.mode-prediction #predictionText{color:var(--yellow);font-weight:700}
-.mode-prediction .reef-card{box-shadow:0 0 0 1px rgba(255,215,111,.35),0 0 16px rgba(255,215,111,.2)}
-
-.mode-engineer .reef-card{display:none}
-.mode-engineer .left-panel .sensor-grid{grid-template-columns:1fr}
-.mode-engineer .center-panel{border-color:rgba(255,159,112,.6)}
-
-.mode-ecology .vision-card{opacity:.55}
-.mode-ecology .center-panel,.mode-ecology .left-panel{border-color:rgba(97,251,178,.55);box-shadow:0 0 0 1px rgba(97,251,178,.25),0 0 18px rgba(97,251,178,.2)}
-
-@media (max-width:1200px){.hero-content,.grid-layout,.bottom-panel{grid-template-columns:1fr}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="app.js"></script>
+  </body>
+</html>
